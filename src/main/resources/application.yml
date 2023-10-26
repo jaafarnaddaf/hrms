@@ -1,0 +1,6 @@
+jwt:
+  secret: 230101.hrms
+spring:
+  data:
+    mongodb:
+      database: hrms
