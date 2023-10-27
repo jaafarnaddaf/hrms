@@ -57,7 +57,7 @@ public class WebSecurityConfiguration {
             authorization -> {
               try {
                 authorization
-                    .requestMatchers("/authenticate")
+                    .requestMatchers("/authenticate", "/register")
                     .permitAll()
                     .anyRequest()
                     .authenticated()

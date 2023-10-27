@@ -2,6 +2,7 @@ package com.livelightlabs.hrms.controller;
 
 import com.livelightlabs.hrms.bean.jwt.JwtRequest;
 import com.livelightlabs.hrms.bean.jwt.JwtResponse;
+import com.livelightlabs.hrms.document.employee.Employee;
 import com.livelightlabs.hrms.service.authentication.JwtTokenService;
 import com.livelightlabs.hrms.service.employee.EmployeeService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,7 @@ public class AuthenticationController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenService jwtTokenService;
   private final EmployeeService employeeService;
+  private final PasswordEncoder passwordEncoder;
 
   @PostMapping("/authenticate")
   public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
@@ -33,7 +36,13 @@ public class AuthenticationController {
     final String token = jwtTokenService.generateToken(userDetails);
     return ResponseEntity.ok(new JwtResponse(token));
   }
+  @PostMapping("/register")
+  public ResponseEntity<?> register(@RequestBody Employee employee) throws Exception {
+   var encodedPassword =  passwordEncoder.encode(employee.getPassword());
+    employee.setPassword(encodedPassword);
+    return ResponseEntity.ok(employeeService.save(employee).block());
 
+  }
   private void authenticate(String username, String password) throws Exception {
     try {
       authenticationManager.authenticate(
